@@ -238,7 +238,7 @@ use yii\bootstrap\NavBar;
                             <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle"
                                  alt="User Image"/>
 
-                            <p> <?= Yii::$app->user->identity->username?>
+                            <p id="username" data-username="<?= Yii::$app->user->identity->username?>"> <?= Yii::$app->user->identity->username?>
                                 <small>Member since Nov. 2012</small>
                             </p>
                         </li>

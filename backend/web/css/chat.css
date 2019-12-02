@@ -1,0 +1,54 @@
+
+.chat {
+    padding: 0 !important;
+    position: fixed;
+    bottom: 0;
+    right: 0%;
+    z-index: 3;
+}
+
+.chat div {
+    padding: 0;
+}
+.chat-header{
+    background-color: #1a2226;
+    color: white;
+    text-align: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.chat-body {
+    display: none;
+    background-color: #222d32;
+    height: 400px;
+}
+
+.chat-window {
+    overflow-y: auto;
+    height: 90%;
+    margin: 0 2%;
+}
+.chat-row {
+    margin-top: 3%;
+}
+.message {
+    background-color: #F8F8FF;
+    display: block;
+    box-sizing: border-box;
+    color: black;
+    border-radius: 10px;
+}
+
+
+.chat-username, chat-time {
+    text-align: center;
+}
+
+.chat-text {
+   padding: 0 5% !important;
+}
+
+.chat-footer {
+    height: 10%;
+    text-align: center;
+}

@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use phpDocumentor\Reflection\Types\This;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -85,6 +86,7 @@ class SiteController extends Controller
             ]);
         }
     }
+
 
     /**
      * Logout action.

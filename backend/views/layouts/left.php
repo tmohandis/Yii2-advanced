@@ -1,3 +1,7 @@
+<?php
+use common\modules\chat\widgets\Chat;
+?>
+
 <aside class="main-sidebar">
 
     <section class="sidebar">
@@ -50,7 +54,6 @@
                 ],
             ]
         ) ?>
-
     </section>
 
 </aside>

@@ -4,7 +4,7 @@ namespace common\widgets;
 use Yii;
 
 /**
- * Alert widget renders a message from session flash. All flash messages are displayed
+ * Chat widget renders a message from session flash. All flash messages are displayed
  * in the sequence they were assigned using setFlash. You can set message as following:
  *
  * ```php
@@ -39,7 +39,7 @@ class Alert extends \yii\bootstrap\Widget
     ];
     /**
      * @var array the options for rendering the close button tag.
-     * Array will be passed to [[\yii\bootstrap\Alert::closeButton]].
+     * Array will be passed to [[\yii\bootstrap\Chat::closeButton]].
      */
     public $closeButton = [];
 
