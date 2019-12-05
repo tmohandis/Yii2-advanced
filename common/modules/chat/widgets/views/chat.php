@@ -8,11 +8,11 @@ use yii\helpers\Html;
     </div>
     <div class="chat-body col-lg-12 center-block" id="chat-body">
         <div class="chat-window" id="chat">
+            <?= Html::button('Connect', ['class' => 'send-button chat-connect center-block', 'id' => 'chat-connect']); ?>
         </div>
-        <div class="chat-footer col-lg-12">
-            <input name="chat-input"> <?= Html::button('Send', ['class' => 'send-button']); ?>
+        <div class="chat-footer col-lg-12 hidden" id="chat-footer">
+            <input name="chat-input"> <?= Html::button('Send', ['class' => 'send-button', 'id' => 'chat-send']); ?>
         </div>
-
     </div>
 </div>
 </div>

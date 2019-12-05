@@ -1,8 +1,11 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\Task;
+use common\models\User;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
+use frontend\modules\api\models\Project;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;

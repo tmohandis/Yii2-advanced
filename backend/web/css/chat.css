@@ -10,13 +10,15 @@
 .chat div {
     padding: 0;
 }
-.chat-header{
+
+.chat-header {
     background-color: #1a2226;
     color: white;
     text-align: center;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
+
 .chat-body {
     display: none;
     background-color: #222d32;
@@ -25,27 +27,47 @@
 
 .chat-window {
     overflow-y: auto;
+    overflow-x: hidden;
     height: 90%;
     margin: 0 2%;
 }
+
 .chat-row {
     margin-top: 3%;
 }
+
 .message {
     background-color: #F8F8FF;
     display: block;
     box-sizing: border-box;
     color: black;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
-
-.chat-username, chat-time {
+.chat-username, .chat-time {
     text-align: center;
+    font-size: 70%;
+    color: #C0C0C0;
+}
+
+.chat-username {
+    text-align: left;
+    padding-left: 5% !important;
+}
+
+.chat-time {
+    text-align: right;
+    padding-right: 5% !important;
+}
+
+.chat-connect {
+    position: relative;
+    top: 50%;
+    height: 10%;
 }
 
 .chat-text {
-   padding: 0 5% !important;
+    padding: 0 5% !important;
 }
 
 .chat-footer {

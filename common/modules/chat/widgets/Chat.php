@@ -6,9 +6,12 @@ use Yii;
 use yii\bootstrap\Widget;
 class Chat extends Widget
 {
+    public $port = 8080;
+
     public function init()
     {
         ChatAsset::register($this->view);
+        $this->view->registerJsVar('wsPort', $this->port);
     }
 
     public function run()

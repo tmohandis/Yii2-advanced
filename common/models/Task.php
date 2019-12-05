@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\behaviors\BlameableBehavior;
 
 /**
  * This is the model class for table "task".
@@ -22,9 +24,25 @@ use Yii;
  * @property User $creator
  * @property User $executor
  * @property User $updater
+ * @property Project $project
  */
 class Task extends \yii\db\ActiveRecord
 {
+
+    public function behaviors()
+    {
+        return [
+
+            'class' => TimestampBehavior::class,
+
+            [
+                'class' => BlameableBehavior::class,
+                'createdByAttribute' => 'creator_id',
+                'updatedByAttribute' => 'updater_id'
+            ],
+
+        ];
+    }
     /**
      * {@inheritdoc}
      */
@@ -74,7 +92,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getCreator()
     {
-        return $this->hasOne(User::className(), ['id' => 'creator_id']);
+        return $this->hasOne(User::class, ['id' => 'creator_id']);
     }
 
     /**
@@ -82,7 +100,11 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getExecutor()
     {
-        return $this->hasOne(User::className(), ['id' => 'executor_id']);
+        return $this->hasOne(User::class, ['id' => 'executor_id']);
+    }
+
+    public function getProject() {
+        return $this->hasOne(Project::class, ['id' => 'project_id']);
     }
 
     /**
@@ -90,7 +112,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getUpdater()
     {
-        return $this->hasOne(User::className(), ['id' => 'updater_id']);
+        return $this->hasOne(User::class(), ['id' => 'updater_id']);
     }
 
     /**

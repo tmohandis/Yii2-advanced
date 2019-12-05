@@ -23,6 +23,11 @@ use yii\web\IdentityInterface;
  * @property string $access_token
  * @property string $avatar
  * @property string $password write-only password
+ * @property-read Project $createdProjects
+ * @property-read Project $updatedProjects
+ * @property-read Task $createdTasks
+ * @property-read Task $updatedTasks
+ * @property-read Task $activeTasks
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -207,5 +212,25 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    public function getActiveTasks() {
+        return Task::find()->where(['executor_id' => $this->id]);
+    }
+
+    public function getCreatedTasks() {
+        return Task::find()->where(['creator_id' => $this->id]);
+    }
+
+    public function getUpdatedTasks() {
+        return Task::find()->where(['updater_id' => $this->id]);
+    }
+
+    public function getCreatedProjects() {
+        return Project::find()->where(['creator_id' => $this->id]);
+    }
+
+    public function getUpdatedProjects() {
+        return Project::find()->where(['updater_id' => $this->id]);
     }
 }
