@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use Yii;
@@ -34,7 +35,22 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
+    const AVATAR_ICO = 'ico';
+    const AVATAR_PREVIEW = 'preview';
+    const STATUS_LIST = [
+        self::STATUS_ACTIVE,
+        self::STATUS_INACTIVE,
+        self::STATUS_DELETED
+    ];
+    const STATUS_LABELS = [
+            self::STATUS_ACTIVE => 'active',
+            self::STATUS_INACTIVE => 'inactive',
+            self::STATUS_DELETED => 'deleted'
+        ];
+    const SCENARIO_INSERT = 'insert';
+    const SCENARIO_UPDATE = 'update';
 
+    private $password;
 
     /**
      * {@inheritdoc}
@@ -50,7 +66,25 @@ class User extends ActiveRecord implements IdentityInterface
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            TimestampBehavior::class,
+            [
+                'class' => \mohorev\file\UploadImageBehavior::class,
+                'attribute' => 'avatar',
+                'scenarios' => [self::SCENARIO_INSERT, self::SCENARIO_UPDATE],
+                //'placeholder' => '@app/modules/user/assets/images/userpic.jpg',
+                'path' => '@frontend/web/upload/user/{id}',
+                'url' => Yii::$app->params['hostsFront'] . Yii::getAlias('@web/upload/user/{id}'),
+                'thumbs' => [
+                    self::AVATAR_ICO => [
+                        'width' => 100,
+                        'height' => 100
+                    ],
+                    self::AVATAR_PREVIEW => [
+                        'width' => 200,
+                        'height' => 200
+                    ],
+                ],
+            ]
         ];
     }
 
@@ -60,8 +94,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            ['status', 'default', 'value' => self::STATUS_INACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
+            [['username', 'email'], 'required'],
+            ['password', 'required', 'on' => self::SCENARIO_INSERT],
+            [['username', 'email', 'password'], 'safe'],
+            ['email', 'email'],
+            ['status', 'default', 'value' => self::STATUS_ACTIVE],
+            ['avatar', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'on' => ['insert', 'update']],
+            ['status', 'in', 'range' => self::STATUS_LIST],
+
         ];
     }
 
@@ -116,7 +156,8 @@ class User extends ActiveRecord implements IdentityInterface
      * @param string $token verify email token
      * @return static|null
      */
-    public static function findByVerificationToken($token) {
+    public static function findByVerificationToken($token)
+    {
         return static::findOne([
             'verification_token' => $token,
             'status' => self::STATUS_INACTIVE
@@ -135,7 +176,7 @@ class User extends ActiveRecord implements IdentityInterface
             return false;
         }
 
-        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
+        $timestamp = (int)substr($token, strrpos($token, '_') + 1);
         $expire = Yii::$app->params['user.passwordResetTokenExpire'];
         return $timestamp + $expire >= time();
     }
@@ -182,7 +223,15 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function setPassword($password)
     {
-        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+        $this->password = $password;
+        if ($password) {
+            $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+        }
+    }
+
+   public function getPassword()
+    {
+        return $this->password;
     }
 
     /**
@@ -214,23 +263,37 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
-    public function getActiveTasks() {
+    public function getActiveTasks()
+    {
         return Task::find()->where(['executor_id' => $this->id]);
     }
 
-    public function getCreatedTasks() {
+    public function getCreatedTasks()
+    {
         return Task::find()->where(['creator_id' => $this->id]);
     }
 
-    public function getUpdatedTasks() {
+    public function getUpdatedTasks()
+    {
         return Task::find()->where(['updater_id' => $this->id]);
     }
 
-    public function getCreatedProjects() {
+    public function getCreatedProjects()
+    {
         return Project::find()->where(['creator_id' => $this->id]);
     }
 
-    public function getUpdatedProjects() {
+    public function getUpdatedProjects()
+    {
         return Project::find()->where(['updater_id' => $this->id]);
+    }
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            $this->generateAuthKey();
+            return true;
+        }
+        return false;
     }
 }
