@@ -2,9 +2,11 @@
 
 namespace common\models;
 
+use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "project".
@@ -25,6 +27,13 @@ use yii\behaviors\BlameableBehavior;
  */
 class Project extends \yii\db\ActiveRecord
 {
+    const PROJECT_ACTIVE = 1;
+    const PROJECT_INACTIVE = 0;
+    const PROJECT_ACTIVE_LABELS = [
+        self::PROJECT_ACTIVE => 'active',
+        self::PROJECT_INACTIVE => 'inactive'
+    ];
+    const RELATIVE_PROJECT_USER = 'projectUsers';
 
     public function behaviors()
     {
@@ -37,9 +46,16 @@ class Project extends \yii\db\ActiveRecord
                 'createdByAttribute' => 'creator_id',
                 'updatedByAttribute' => 'updater_id'
             ],
+            [
+                'class' => SaveRelationsBehavior::class,
+                'relations' => [
+                    self::RELATIVE_PROJECT_USER
+                ]
+            ]
 
         ];
     }
+
     /**
      * {@inheritdoc}
      */
@@ -96,12 +112,27 @@ class Project extends \yii\db\ActiveRecord
         return $this->hasOne(User::className(), ['id' => 'updater_id']);
     }
 
+    public function getUsersQuery()
+    {
+        $idArray = [];
+        $projectsArray = ArrayHelper::toArray($this->projectUsers);
+        foreach ($projectsArray  as $item) {
+            array_push($idArray, $item['user_id']);
+        }
+        return User::find()->where(['id' => $idArray]);
+    }
+
+    public function getUsers()
+    {
+        return $this->getUsersQuery()->all();
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */
     public function getProjectUsers()
     {
-        return $this->hasMany(ProjectUser::className(), ['project_id' => 'id']);
+        return $this->hasMany(ProjectUser::class, ['project_id' => 'id']);
     }
 
     public function getTasks()

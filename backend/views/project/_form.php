@@ -5,7 +5,11 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Project */
+
 /* @var $form yii\widgets\ActiveForm */
+
+use unclead\multipleinput\MultipleInput;
+
 ?>
 
 <div class="project-form">
@@ -18,13 +22,32 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'active')->textInput() ?>
 
-    <?= $form->field($model, 'creator_id')->textInput() ?>
+    <?= $form->field($model, \common\models\Project::RELATIVE_PROJECT_USER)->widget(MultipleInput::class, [
+        'id' => 'project-users-widget',
+        'max' => 10,
+        'min' => 0,
+        'addButtonPosition' => MultipleInput::POS_HEADER,
+        'columns' => [
+            [
+                'name' => 'project_id',
+                'type' => 'hiddenInput',
+                'defaultValue' => $model->id
+            ],
+            [
+                'name' => 'user_id',
+                'type' => 'dropDownLIst',
+                'title' => 'User',
+                'items' => $users
+            ],
+            [
+                'name' => 'role',
+                'type' => 'dropDownLIst',
+                'title' => 'Role',
+                'items' => \common\models\ProjectUser::ROLES_LABELS
+            ],
 
-    <?= $form->field($model, 'updater_id')->textInput() ?>
-
-    <?= $form->field($model, 'created_at')->textInput() ?>
-
-    <?= $form->field($model, 'updated_at')->textInput() ?>
+        ]
+    ]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

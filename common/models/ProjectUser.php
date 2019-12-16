@@ -17,6 +17,22 @@ use Yii;
  */
 class ProjectUser extends \yii\db\ActiveRecord
 {
+    const ROLE_MANAGER = 'manager';
+    const ROLE_DEVELOPER = 'developer';
+    const ROLE_TESTER = 'tester';
+
+    const ROLES = [
+      self::ROLE_MANAGER,
+      self::ROLE_DEVELOPER,
+      self::ROLE_TESTER
+    ];
+
+    const ROLES_LABELS = [
+        self::ROLE_MANAGER => 'manager',
+        self::ROLE_DEVELOPER => 'developer',
+        self::ROLE_TESTER => 'tester'
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -66,6 +82,11 @@ class ProjectUser extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    public function getRole()
+    {
+        return $this->role;
     }
 
     /**

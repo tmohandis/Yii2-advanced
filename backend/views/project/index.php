@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\ProjectSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -29,12 +30,18 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'title',
-            'description:ntext',
-            'active',
+            'description:text',
+            [
+                'attribute' => 'active',
+                'value' => function ($model) {
+                    return $model::PROJECT_ACTIVE_LABELS[$model->active];
+                },
+                'filter' => \common\models\Project::PROJECT_ACTIVE_LABELS,
+            ],
             'creator_id',
-            //'updater_id',
-            //'created_at',
-            //'updated_at',
+            'updater_id',
+            'created_at:date',
+            'updated_at:date',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

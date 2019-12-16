@@ -1,8 +1,9 @@
 <?php
 
+
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model common\models\Project */
 
@@ -31,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'title',
-            'description:ntext',
+            'description:text',
             'active',
             'creator_id',
             'updater_id',
@@ -39,5 +40,35 @@ $this->params['breadcrumbs'][] = $this->title;
             'updated_at',
         ],
     ]) ?>
+
+    <?= \yii\grid\GridView::widget([
+        'dataProvider' => $provider,
+        'filterModel' => $search,
+        'columns' => [
+            [
+                'attribute' => 'username',
+                'value' => function ($model) {
+                    return Html::a(Html::encode($model->username), Url::to(['user/view', 'id' => $model->id]));
+                },
+                'format' => 'raw',
+            ],
+            [
+                'attribute' => 'status',
+
+                'value' => function ($model) {
+                    return $model::STATUS_LABELS[$model->status];
+                },
+                'filter' => \common\models\User::STATUS_LABELS,
+            ],
+            'email:email',
+            [
+                'attribute' => 'role',
+                'value' => function ($model) {
+                    return $model->getProjectRole(Yii::$app->request->get('id'));
+                },
+            ]
+        ],
+    ]) ?>
+
 
 </div>

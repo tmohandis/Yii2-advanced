@@ -2,11 +2,13 @@
 
 namespace common\models;
 
+use phpDocumentor\Reflection\Types\Integer;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use yii\helpers\ArrayHelper;
 
 /**
  * User model
@@ -49,7 +51,7 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     const SCENARIO_INSERT = 'insert';
     const SCENARIO_UPDATE = 'update';
-
+    const EVENT_AFTER_LOGIN = 'afterLogin';
     private $password;
 
     /**
@@ -263,10 +265,42 @@ class User extends ActiveRecord implements IdentityInterface
         $this->password_reset_token = null;
     }
 
+    public function getProjectRole($project)
+    {
+        $data = ProjectUser::findOne([
+            'project_id' => $project,
+            'user_id' => $this->id
+        ]);
+        return $data->role;
+    }
+
+    public function getProjectUsers()
+    {
+        return ProjectUser::find()->where([
+            'user_id' => $this->id
+        ])->all();
+    }
+
+    public function getProjectsQuery()
+    {
+        $idArray = [];
+        $projectsArray = ArrayHelper::toArray($this->getProjectUsers());
+        foreach ($projectsArray  as $item) {
+            array_push($idArray, $item['project_id']);
+        }
+        return Project::find()->where(['id' => $idArray]);
+    }
+
+    public function getProjects()
+    {
+        return $this->getProjectsQuery()->all();
+    }
+
     public function getActiveTasks()
     {
         return Task::find()->where(['executor_id' => $this->id]);
     }
+
 
     public function getCreatedTasks()
     {

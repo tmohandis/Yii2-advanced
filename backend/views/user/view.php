@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 
@@ -49,6 +49,33 @@ $this->params['breadcrumbs'][] = $this->title;
             'verification_token',
             'access_token',
 
+        ],
+    ]) ?>
+
+    <?= \yii\grid\GridView::widget([
+        'dataProvider' => $provider,
+        'filterModel' => $search,
+        'columns' => [
+            'id',
+            [
+              'attribute' => 'title',
+                'value' => function ($model) {
+                    return Html::a(Html::encode($model->title), Url::to(['project/view', 'id' => $model->id]));
+                },
+                'format' => 'raw',
+            ],
+            'description:text',
+            [
+                'attribute' => 'active',
+                'value' => function ($model) {
+                    return $model::PROJECT_ACTIVE_LABELS[$model->active];
+                },
+                'filter' => \common\models\Project::PROJECT_ACTIVE_LABELS,
+            ],
+            'creator_id',
+            'updater_id',
+            'created_at:date',
+            'updated_at:date',
         ],
     ]) ?>
 

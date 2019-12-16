@@ -2,9 +2,11 @@
 
 namespace backend\controllers;
 
+use common\models\search\ProjectSearch;
 use Yii;
 use common\models\User;
 use common\models\search\UserSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -52,8 +54,16 @@ class UserController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $searchModel = new ProjectSearch();
+        $dataProvider = new ActiveDataProvider([
+            'query' => $model->getProjectsQuery()
+        ]);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'provider' => $dataProvider,
+            'search' => $searchModel
         ]);
     }
 

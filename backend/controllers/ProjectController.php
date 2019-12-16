@@ -2,12 +2,18 @@
 
 namespace backend\controllers;
 
+use common\models\search\UserSearch;
 use Yii;
 use common\models\Project;
 use common\models\search\ProjectSearch;
+use common\models\User;
+use yii\data\ActiveDataProvider;
+use yii\data\SqlDataProvider;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Request;
 
 /**
  * ProjectController implements the CRUD actions for Project model.
@@ -52,8 +58,16 @@ class ProjectController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $searchModel = new UserSearch();
+        $dataProvider = new ActiveDataProvider([
+            'query' => $model->getUsersQuery()
+        ]);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'provider' => $dataProvider,
+            'search' => $searchModel
         ]);
     }
 
@@ -85,13 +99,14 @@ class ProjectController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $users = User::find()->select('username')->indexBy('id')->column();
+        if ($this->loadProjectModel($model) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
             'model' => $model,
+            'users' => $users
         ]);
     }
 
@@ -121,7 +136,15 @@ class ProjectController extends Controller
         if (($model = Project::findOne($id)) !== null) {
             return $model;
         }
-
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    private function loadProjectModel (Project $model) {
+        $data = Yii::$app->request->post($model->formName());
+        $projectUsers = $data[Project::RELATIVE_PROJECT_USER] ?? null;
+        if ($projectUsers !== null){
+            $model->projectUsers = $projectUsers === '' ? [] : $projectUsers;
+        }
+        return $model->load(Yii::$app->request->post());
     }
 }
