@@ -10,6 +10,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -28,6 +29,15 @@ class UserController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+                'access' => [
+                    'class' => AccessControl::className(),
+                    'rules' => [
+                        [
+                            'allow' => true,
+                            'roles' => ['admin'],
+                        ],
+                    ],
+                ],
         ];
     }
 
@@ -105,6 +115,11 @@ class UserController extends Controller
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    public function actionProfile()
+    {
+        return $this->actionUpdate(Yii::$app->user->identity->getId());
     }
 
     /**

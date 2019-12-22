@@ -114,17 +114,22 @@ class Project extends \yii\db\ActiveRecord
 
     public function getUsersQuery()
     {
-        $idArray = [];
-        $projectsArray = ArrayHelper::toArray($this->projectUsers);
-        foreach ($projectsArray  as $item) {
-            array_push($idArray, $item['user_id']);
-        }
-        return User::find()->where(['id' => $idArray]);
+        return User::find()->where(['id' => $this->getUsersId()]);
     }
 
     public function getUsers()
     {
         return $this->getUsersQuery()->all();
+    }
+
+    public function getUsersRole()
+    {
+        return $this->getProjectUsers()->select('role')->indexBy('user_id')->column();
+    }
+
+    public function getUsersId()
+    {
+        return array_keys($this->getUsersRole());
     }
 
     /**

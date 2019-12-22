@@ -14,6 +14,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Request;
+use yii\filters\AccessControl;
 
 /**
  * ProjectController implements the CRUD actions for Project model.
@@ -27,9 +28,18 @@ class ProjectController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['admin'],
+                    ],
                 ],
             ],
         ];
@@ -100,7 +110,15 @@ class ProjectController extends Controller
     {
         $model = $this->findModel($id);
         $users = User::find()->select('username')->indexBy('id')->column();
+        $projectUsers = $model->getUsersRole();
+
         if ($this->loadProjectModel($model) && $model->save()) {
+            if ($diffRoles = array_diff_assoc($model->getUsersRole(), $projectUsers)) {
+                foreach ($diffRoles as $userId => $role) {
+                    Yii::$app->projectService->assignRole($model, User::findOne($userId), $role);
+                }
+
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -139,10 +157,11 @@ class ProjectController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    private function loadProjectModel (Project $model) {
+    private function loadProjectModel(Project $model)
+    {
         $data = Yii::$app->request->post($model->formName());
         $projectUsers = $data[Project::RELATIVE_PROJECT_USER] ?? null;
-        if ($projectUsers !== null){
+        if ($projectUsers !== null) {
             $model->projectUsers = $projectUsers === '' ? [] : $projectUsers;
         }
         return $model->load(Yii::$app->request->post());
